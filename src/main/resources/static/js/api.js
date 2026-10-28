@@ -3,7 +3,8 @@
  * Módulo de Integração com API REST
  */
 
-const API_BASE = '/api';
+const API_ORIGIN = (window.NEXUS_API_BASE || '').replace(/\/+$/, '');
+const API_BASE = `${API_ORIGIN}/api`;
 
 const Api = {
   getToken() {

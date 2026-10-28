@@ -173,6 +173,29 @@ Abra o navegador em:
 
 ---
 
+## ☁️ Publicação separada: Vercel (frontend) + Render (backend)
+
+### Backend no Render
+
+1. Crie um **Web Service** ligado ao repositório e selecione **Docker** como ambiente. O `Dockerfile` da raiz compila e inicia a aplicação Java.
+2. Configure as variáveis de ambiente do serviço:
+   - `NEXUS_JWT_SECRET`: segredo aleatório longo, diferente do segredo local.
+   - `NEXUS_CORS_ALLOWED_ORIGINS`: URL do site Vercel, por exemplo `https://meu-portal.vercel.app` (sem barra no final). Para mais de uma origem, separe por vírgula.
+   - Para PostgreSQL: `SPRING_DATASOURCE_URL` no formato JDBC (`jdbc:postgresql://HOST:5432/NOME_BANCO`), `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, `SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver` e `SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect`.
+3. O serviço aceita a porta `PORT` configurada pela plataforma. O SQLite local continua sendo o padrão se as variáveis do PostgreSQL não forem informadas, mas o disco do serviço gratuito Render é temporário; dados SQLite podem ser perdidos ao reiniciar, dormir ou publicar novamente. Use um PostgreSQL persistente para manter dados. Confira os limites e a duração do plano gratuito do banco na documentação atual do Render.
+
+O Dockerfile ativa o perfil `render`, que exige `NEXUS_JWT_SECRET` e `NEXUS_CORS_ALLOWED_ORIGINS`; sem essas variáveis o backend não inicia, evitando publicar por engano com segredo de desenvolvimento ou CORS local. As contas de demonstração são criadas com senhas conhecidas pelo `DataInitializer`; não use esses usuários nem dados de demonstração para proteger informações reais.
+
+### Frontend na Vercel
+
+1. Importe o repositório na Vercel e defina **Root Directory** como `src/main/resources/static`. Não é necessário comando de build nem arquivo `.env` para os arquivos estáticos.
+2. Depois de obter a URL pública do backend no Render, edite `js/config.js` e preencha `window.NEXUS_API_BASE` com essa URL, sem `/api` no final. Exemplo: `window.NEXUS_API_BASE = 'https://meu-backend.onrender.com';` Faça commit e publique novamente.
+3. Confirme que `NEXUS_CORS_ALLOWED_ORIGINS` no Render contém exatamente o domínio Vercel usado. Se também usar um domínio personalizado, inclua ambas as origens separadas por vírgula.
+
+O backend lê configuração e segredos das variáveis de ambiente do Render; não coloque o segredo JWT no código. Um arquivo `.env` local é opcional e não é necessário para configurar os serviços hospedados.
+
+---
+
 ## 📡 Principais Endpoints da API REST
 
 ### Autenticação & Perfil
