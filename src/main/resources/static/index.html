@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Grupo Nexus - Gestão Interna de Funcionários</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+</head>
+<body>
+
+  <!-- ========================================================
+       TELA DE LOGIN
+       ======================================================== -->
+  <div id="login-view" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <h1>GRUPO NEXUS</h1>
+        <p>Portal Corporativo de Gestão Interna</p>
+      </div>
+
+      <div class="login-body">
+        <!-- ATALHOS DE DEMO RÁPIDA -->
+        <div class="demo-pills-box">
+          <div class="demo-pills-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            Acesso Rápido para Testes:
+          </div>
+          <div class="demo-pills">
+            <button type="button" class="btn-pill" onclick="App.preencherLogin('admin')">Admin</button>
+            <button type="button" class="btn-pill" onclick="App.preencherLogin('rh')">RH</button>
+            <button type="button" class="btn-pill" onclick="App.preencherLogin('funcionario')">Funcionário</button>
+          </div>
+        </div>
+
+        <form id="form-login" onsubmit="App.submitLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="login-usuario">E-mail ou Matrícula</label>
+            <input type="text" id="login-usuario" class="form-control" placeholder="ex: admin, rh ou NEX-1002" required autocomplete="username">
+          </div>
+
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+              <label class="form-label" for="login-senha" style="margin-bottom:0;">Senha</label>
+              <a href="#" style="font-size:0.75rem;" onclick="App.openModal('modal-recuperar-senha'); return false;">Esqueceu a senha?</a>
+            </div>
+            <input type="password" id="login-senha" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+
+          <button type="submit" id="btn-login-submit" class="btn btn-primary" style="width:100%; margin-top:0.75rem;">
+            Entrar no Portal
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       APLICAÇÃO AUTENTICADA (APP SHELL)
+       ======================================================== -->
+  <div id="app-view" class="app-container" style="display:none;">
+    
+    <!-- BACKDROP MOBILE -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="App.closeSidebar()"></div>
+
+    <!-- SIDEBAR LATERAL -->
+    <aside id="app-sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-wrapper">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h2>GRUPO NEXUS</h2>
+            <span>Gestão Interna</span>
+          </div>
+        </div>
+        <button class="sidebar-close-btn" onclick="App.closeSidebar()">&times;</button>
+      </div>
+
+      <!-- ITENS DE MENU -->
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Principal</div>
+        <a class="nav-item active" data-page="dashboard" onclick="App.navigate('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a class="nav-item" data-page="perfil" onclick="App.navigate('perfil')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span>Meu Perfil</span>
+        </a>
+
+        <div class="nav-section-title">Operacional</div>
+        <a class="nav-item menu-rh-admin" data-page="funcionarios" onclick="App.navigate('funcionarios')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span>Funcionários</span>
+        </a>
+
+        <a class="nav-item" data-page="escalas" onclick="App.navigate('escalas')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>Escalas de Trabalho</span>
+        </a>
+
+        <a class="nav-item" data-page="beneficios" onclick="App.navigate('beneficios')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <span>Benefícios</span>
+        </a>
+
+        <a class="nav-item" data-page="comunicados" onclick="App.navigate('comunicados')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <span>Comunicados</span>
+        </a>
+
+        <div class="nav-section-title menu-rh-admin">Administração</div>
+        <a class="nav-item menu-rh-admin" data-page="organizacao" onclick="App.navigate('organizacao')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          <span>Cargos & Setores</span>
+        </a>
+
+        <a class="nav-item menu-admin-only" data-page="usuarios" onclick="App.navigate('usuarios')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span>Usuários & Acessos</span>
+        </a>
+      </nav>
+
+      <!-- RODAPÉ DA SIDEBAR COM PERFIL -->
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <div id="sidebar-user-monogram" class="user-monogram">NX</div>
+          <div class="user-info-text">
+            <div id="sidebar-user-name" class="user-name">Carregando...</div>
+            <span id="sidebar-user-role" class="user-role-tag">Colaborador</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- WRAPPER DE CONTEÚDO PRINCIPAL -->
+    <div class="main-wrapper">
+      
+      <!-- TOPBAR FIXA -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger-btn" onclick="App.toggleSidebar()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="page-title">
+            <h1 id="current-page-title">Dashboard</h1>
+            <p id="current-page-desc">Visão geral corporativa e indicadores de gestão</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <span id="topbar-role-badge" class="role-badge funcionario">Funcionário</span>
+          <button class="btn-logout" onclick="App.logout()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <span>Sair</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEWPORT DINÂMICA -->
+      <main class="content-body" id="view-container">
+        <!-- Renderizado dinamicamente via JS -->
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAIS DA APLICAÇÃO
+       ======================================================== -->
+
+  <!-- MODAL: RECUPERAÇÃO DE SENHA -->
+  <div id="modal-recuperar-senha" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Recuperação de Acesso</h3>
+        <button class="modal-close-btn" onclick="App.closeModal('modal-recuperar-senha')">&times;</button>
+      </div>
+      <form onsubmit="App.submitRecuperarSenha(event)">
+        <div class="modal-body">
+          <p style="font-size:0.88rem; color:var(--slate-600); margin-bottom:1rem;">
+            Informe seu e-mail corporativo ou matrícula cadastrada. O sistema enviará as instruções para redefinição de sua credencial.
+          </p>
+          <div class="form-group">
+            <label class="form-label" for="recuperar-identificador">E-mail ou Matrícula</label>
+            <input type="text" id="recuperar-identificador" class="form-control" placeholder="ex: seu.nome@gruponexus.com.br ou NEX-1002" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('modal-recuperar-senha')">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Enviar Instruções</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ALTERAR SENHA -->
+  <div id="modal-alterar-senha" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Alterar Senha de Acesso</h3>
+        <button class="modal-close-btn" onclick="App.closeModal('modal-alterar-senha')">&times;</button>
+      </div>
+      <form id="form-alterar-senha" onsubmit="App.submitAlterarSenha(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="senha-atual">Senha Atual</label>
+            <input type="password" id="senha-atual" class="form-control" required placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="nova-senha">Nova Senha</label>
+            <input type="password" id="nova-senha" class="form-control" required minlength="6" placeholder="Mínimo 6 caracteres">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="nova-senha-conf">Confirmar Nova Senha</label>
+            <input type="password" id="nova-senha-conf" class="form-control" required minlength="6" placeholder="Repita a nova senha">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('modal-alterar-senha')">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Salvar Nova Senha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CADASTRO / EDIÇÃO DE FUNCIONÁRIO -->
+  <div id="modal-funcionario" class="modal-overlay">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h3 id="modal-func-title">Cadastrar Novo Colaborador</h3>
+        <button class="modal-close-btn" onclick="App.closeModal('modal-funcionario')">&times;</button>
+      </div>
+      <form id="form-funcionario" onsubmit="FuncionariosView.salvarFuncionario(event)">
+        <input type="hidden" id="func-id">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="func-matricula">Matrícula *</label>
+              <input type="text" id="func-matricula" class="form-control" required placeholder="ex: NEX-1010">
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <label class="form-label" for="func-nome">Nome Completo *</label>
+              <input type="text" id="func-nome" class="form-control" required placeholder="Nome e sobrenome">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="func-email">E-mail Corporativo *</label>
+              <input type="email" id="func-email" class="form-control" required placeholder="colaborador@gruponexus.com.br">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="func-telefone">Telefone / WhatsApp</label>
+              <input type="text" id="func-telefone" class="form-control" placeholder="(11) 90000-0000">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="func-cpf">CPF</label>
+              <input type="text" id="func-cpf" class="form-control" placeholder="000.000.000-00">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="func-dataAdmissao">Data de Admissão *</label>
+              <input type="date" id="func-dataAdmissao" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="func-dataNascimento">Data de Nascimento</label>
+              <input type="date" id="func-dataNascimento" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="func-status">Status</label>
+              <select id="func-status" class="form-control">
+                <option value="ATIVO">Ativo</option>
+                <option value="INATIVO">Inativo</option>
+                <option value="FERIAS">Férias</option>
+                <option value="AFASTADO">Afastado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="func-tipoContrato">Tipo de Contrato</label>
+              <select id="func-tipoContrato" class="form-control">
+                <option value="CLT">CLT Efetivo</option>
+                <option value="PJ">PJ / Prestador</option>
+                <option value="ESTAGIO">Estágio</option>
+                <option value="TEMPORARIO">Temporário</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="func-setor">Setor / Departamento *</label>
+              <select id="func-setor" class="form-control" required onchange="FuncionariosView.atualizarCargosPorSetor(this.value)">
+                <!-- Preenchido via JS -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="func-cargo">Cargo *</label>
+              <select id="func-cargo" class="form-control" required>
+                <!-- Preenchido via JS -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="func-escala">Escala de Trabalho</label>
+              <select id="func-escala" class="form-control">
+                <!-- Preenchido via JS -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Benefícios Atribuídos</label>
+            <div id="func-beneficios-checkboxes" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:0.5rem; max-height:160px; overflow-y:auto; padding:0.5rem; border:1px solid var(--slate-200); border-radius:var(--radius-md);">
+              <!-- Preenchido via JS -->
+            </div>
+          </div>
+
+          <!-- CRIAÇÃO DE USUÁRIO DE ACESSO -->
+          <div id="box-usuario-acesso" style="background:var(--nexus-blue-50); border:1px solid var(--nexus-blue-100); border-radius:var(--radius-md); padding:1rem; margin-bottom:1.25rem;">
+            <label style="display:flex; align-items:center; gap:0.5rem; font-weight:600; color:var(--nexus-navy-900); cursor:pointer;">
+              <input type="checkbox" id="func-criarUsuario" checked>
+              <span>Criar conta de acesso ao portal para este colaborador</span>
+            </label>
+            <div class="form-row" style="margin-top:0.75rem;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="func-roleUsuario">Nível de Acesso</label>
+                <select id="func-roleUsuario" class="form-control">
+                  <option value="ROLE_FUNCIONARIO">Funcionário (Apenas consulta pessoal)</option>
+                  <option value="ROLE_RH">Recursos Humanos (Gestão de RH)</option>
+                  <option value="ROLE_ADMIN">Administrador Geral</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="func-senhaInicial">Senha Provisória</label>
+                <input type="text" id="func-senhaInicial" class="form-control" value="nexus123">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="func-observacoes">Observações Internas (RH)</label>
+            <textarea id="func-observacoes" class="form-control" rows="2" placeholder="Informações relevantes sobre a contratação ou histórico"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('modal-funcionario')">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Salvar Colaborador</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DOSSIÊ DO COLABORADOR (VISUALIZAÇÃO COMPLETA) -->
+  <div id="modal-dossie" class="modal-overlay">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h3>Dossiê Cadastral do Colaborador</h3>
+        <button class="modal-close-btn" onclick="App.closeModal('modal-dossie')">&times;</button>
+      </div>
+      <div class="modal-body" id="dossie-modal-body">
+        <!-- Preenchido via JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('modal-dossie')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ESCALA -->
+  <div id="modal-escala" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-escala-title">Escala de Trabalho</h3>
+        <button class="modal-close-btn" onclick="App.closeModal('modal-escala')">&times;</button>
+      </div>
+      <form id="form-escala" onsubmit="EscalasView.salvarEscala(event)">
+        <input type="hidden" id="escala-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="escala-nome">Nome da Escala *</label>
+            <input type="text" id="escala-nome" class="form-control" required placeholder="ex: Comercial Padrão 5x2">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="escala-tipo">Tipo de Escala</label>
+              <input type="text" id="escala-tipo" class="form-control" placeholder="ex: 5x2, 6x1, 12x36">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="escala-intervalo">Intervalo</label>
+              <input type="text" id="escala-intervalo" class="form-control" placeholder="ex: 01:00 (12h às 13h)">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="escala-entrada">Horário Entrada</label>
+              <input type="text" id="escala-entrada" class="form-control" placeholder="08:00">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="escala-saida">Horário Saída</label>
+              <input type="text" id="escala-saida" class="form-control" placeholder="17:00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="escala-dias">Dias de Trabalho</label>
+            <input type="text" id="escala-dias" class="form-control" placeholder="Segunda a Sexta-feira">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="escala-folgas">Folgas Programadas</label>
+            <input type="text" id="escala-folgas" class="form-control" placeholder="Sábado e Domingo">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="escala-descricao">Descrição / Observações</label>
+            <textarea id="escala-descricao" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('modal-escala')">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Salvar Escala</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: BENEFÍCIO -->
+  <div id="modal-beneficio" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-beneficio-title">Benefício Corporativo</h3>
+        <button class="modal-close-btn" onclick="App.closeModal('modal-beneficio')">&times;</button>
+      </div>
+      <form id="form-beneficio" onsubmit="BeneficiosView.salvarBeneficio(event)">
+        <input type="hidden" id="beneficio-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="beneficio-nome">Nome do Benefício *</label>
+            <input type="text" id="beneficio-nome" class="form-control" required placeholder="ex: Plano de Saúde Bradesco">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="beneficio-categoria">Categoria</label>
+              <select id="beneficio-categoria" class="form-control">
+                <option value="Saúde">Saúde</option>
+                <option value="Alimentação">Alimentação</option>
+                <option value="Mobilidade">Mobilidade</option>
+                <option value="Bem-Estar">Bem-Estar</option>
+                <option value="Educação">Educação</option>
+                <option value="Segurança">Segurança</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="beneficio-valor">Valor Mensal (Subsídio R$)</label>
+              <input type="number" step="0.01" id="beneficio-valor" class="form-control" placeholder="ex: 850.00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="beneficio-descricao">Descrição do Benefício</label>
+            <textarea id="beneficio-descricao" class="form-control" rows="3" placeholder="Detalhes da cobertura e vantagens"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="beneficio-info">Informações Importantes / Regras</label>
+            <input type="text" id="beneficio-info" class="form-control" placeholder="Regras de carência ou dependentes">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('modal-beneficio')">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Salvar Benefício</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: COMUNICADO -->
+  <div id="modal-comunicado" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-comunicado-title">Publicar Comunicado</h3>
+        <button class="modal-close-btn" onclick="App.closeModal('modal-comunicado')">&times;</button>
+      </div>
+      <form id="form-comunicado" onsubmit="ComunicadosView.salvarComunicado(event)">
+        <input type="hidden" id="comunicado-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="comunicado-titulo">Título do Comunicado *</label>
+            <input type="text" id="comunicado-titulo" class="form-control" required placeholder="Título informativo">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="comunicado-categoria">Categoria</label>
+              <select id="comunicado-categoria" class="form-control">
+                <option value="Institucional">Institucional</option>
+                <option value="Recursos Humanos">Recursos Humanos</option>
+                <option value="Segurança do Trabalho">Segurança do Trabalho</option>
+                <option value="TI & Segurança">TI & Segurança</option>
+                <option value="Treinamento & Inovação">Treinamento & Inovação</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="comunicado-autor">Setor Autor</label>
+              <input type="text" id="comunicado-autor" class="form-control" placeholder="ex: Diretoria de RH">
+            </div>
+          </div>
+          <div class="form-group">
+            <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+              <input type="checkbox" id="comunicado-importante">
+              <span style="font-weight:600; color:var(--rose-600);">Destacar como Comunicado Urgente / Importante</span>
+            </label>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="comunicado-conteudo">Conteúdo *</label>
+            <textarea id="comunicado-conteudo" class="form-control" rows="5" required placeholder="Texto completo do comunicado"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('modal-comunicado')">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Publicar no Mural</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SETOR -->
+  <div id="modal-setor" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-setor-title">Setor Corporativo</h3>
+        <button class="modal-close-btn" onclick="App.closeModal('modal-setor')">&times;</button>
+      </div>
+      <form id="form-setor" onsubmit="OrganizacaoView.salvarSetor(event)">
+        <input type="hidden" id="setor-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="setor-nome">Nome do Setor *</label>
+            <input type="text" id="setor-nome" class="form-control" required placeholder="ex: Engenharia & Obras">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="setor-sigla">Sigla</label>
+            <input type="text" id="setor-sigla" class="form-control" placeholder="ex: ENG">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="setor-descricao">Descrição do Departamento</label>
+            <textarea id="setor-descricao" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('modal-setor')">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Salvar Setor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CARGO -->
+  <div id="modal-cargo" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-cargo-title">Cargo Corporativo</h3>
+        <button class="modal-close-btn" onclick="App.closeModal('modal-cargo')">&times;</button>
+      </div>
+      <form id="form-cargo" onsubmit="OrganizacaoView.salvarCargo(event)">
+        <input type="hidden" id="cargo-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="cargo-nome">Título do Cargo *</label>
+            <input type="text" id="cargo-nome" class="form-control" required placeholder="ex: Desenvolvedor Full Stack">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="cargo-nivel">Nível</label>
+              <select id="cargo-nivel" class="form-control">
+                <option value="Júnior">Júnior</option>
+                <option value="Pleno">Pleno</option>
+                <option value="Sênior">Sênior</option>
+                <option value="Especialista">Especialista</option>
+                <option value="Coordenação">Coordenação</option>
+                <option value="Gerência">Gerência</option>
+                <option value="Diretoria">Diretoria</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cargo-salario">Salário Base Referência (R$)</label>
+              <input type="number" step="0.01" id="cargo-salario" class="form-control" placeholder="ex: 7500.00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cargo-setor-id">Setor Vinculado *</label>
+            <select id="cargo-setor-id" class="form-control" required>
+              <!-- Preenchido via JS -->
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="cargo-descricao">Descrição do Cargo</label>
+            <textarea id="cargo-descricao" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('modal-cargo')">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Salvar Cargo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: USUÁRIO E PERMISSÕES (ADMIN) -->
+  <div id="modal-usuario" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Gerenciar Acesso do Usuário</h3>
+        <button class="modal-close-btn" onclick="App.closeModal('modal-usuario')">&times;</button>
+      </div>
+      <form onsubmit="UsuariosView.salvarUsuario(event)">
+        <input type="hidden" id="user-edit-id">
+        <div class="modal-body">
+          <p style="font-size:0.9rem; margin-bottom:1rem;">
+            Usuário: <strong id="user-edit-username"></strong>
+          </p>
+          <div class="form-group">
+            <label class="form-label" for="user-edit-role">Nível de Permissão (Role) *</label>
+            <select id="user-edit-role" class="form-control" required>
+              <option value="ROLE_FUNCIONARIO">Funcionário (Apenas consulta de seus dados)</option>
+              <option value="ROLE_RH">Recursos Humanos (Gestão de RH, Escalas, Benefícios)</option>
+              <option value="ROLE_ADMIN">Administrador (Controle irrestrito e segurança)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="user-edit-ativo">Status da Conta</label>
+            <select id="user-edit-ativo" class="form-control">
+              <option value="true">Ativa (Acesso Liberado)</option>
+              <option value="false">Bloqueada / Inativa (Sem Acesso)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="user-edit-senha">Redefinir Senha (opcional)</label>
+            <input type="password" id="user-edit-senha" class="form-control" placeholder="Deixe em branco para manter a atual">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="App.closeModal('modal-usuario')">Cancelar</button>
+          <button type="submit" class="btn btn-primary btn-sm">Atualizar Permissões</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONTAINER DE NOTIFICAÇÕES TOAST -->
+  <div id="toast-container"></div>
+
+  <!-- SCRIPTS DA APLICAÇÃO -->
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/views/dashboard.js"></script>
+  <script src="/js/views/perfil.js"></script>
+  <script src="/js/views/funcionarios.js"></script>
+  <script src="/js/views/escalas.js"></script>
+  <script src="/js/views/beneficios.js"></script>
+  <script src="/js/views/comunicados.js"></script>
+  <script src="/js/views/organizacao.js"></script>
+  <script src="/js/views/usuarios.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
